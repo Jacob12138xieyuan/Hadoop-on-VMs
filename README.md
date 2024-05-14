@@ -1,4 +1,4 @@
-# Hadoop Installation on VMs，VMware 虚拟机安装 Hadoop 集群
+# Hadoop/Hive Installation on VMs，VMware 虚拟机安装 Hadoop/Hive 集群详细教程 (Macbook M1/M2)
 
 ## Setup Three VMs with CentOS7，安装三台 CentOS7 虚拟机（M1 Macbook，ARM 架构）
 
@@ -561,13 +561,11 @@ poweroff
 3. Take snapshot for each machine，截取虚拟机快照
    ![](imgs/42.png)
 
-#### 安装 hadoop 参考上一篇：https://blog.csdn.net/Jacob12138/article/details/138716667?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22138716667%22%2C%22source%22%3A%22Jacob12138%22%7D
-
 # Install Hive on Hadoop，hadoop 基础上安装 hive
 
 ## Install MySQL on namenode (hadoop1)，hadoop1 节点安装 MySQL
 
-Hive use MySQL to store meta data， mysql 作为 hive 元数据管理
+Hive use MySQL to store meta data， mysql 作为 hive 元数据管理， 底层把文件映射成表
 Hive support MySQL versions，hive 推荐支持的 mysql 版本:
 MySQL 5.7.x
 MySQL 8.0.x (Only for Hive3.1.x versions)
@@ -793,12 +791,64 @@ quit;
 4. Check yarn web ui http://hadoop1:8088, 查看 yarn web ui，mapreduce 程序
    ![](hive_imgs/7.png)
 
-5. Another option is start hiveserver2, 也可以启动 hiveserver2，使用第三方软件（如 DBeaver）连接 hive
+5. Check data file on HDFS
 
 ```
+hdfs dfs -ls /user/hive/warehouse
+hdfs dfs -ls /user/hive/warehouse/employees
+hdfs dfs -cat /user/hive/warehouse/employees/000000_3
+```
+
+![](hive_imgs/8.png)
+
+数据用文件（类似 csv）进行存储，所以需要元数据管理把文件转化为结构化的数据表
+
+6. Another option is start hiveserver2, 也可以启动 hiveserver2 服务，使用第三方软件（如 DBeaver）**远程连接 hive**
+
+7. Add hadoop configuration, 需要修改 hadoop 配置 proxyuser “hadoop”，允许任何 hosts 使用 hadoop 用户的身份
+
+```
+# core-site.xml, 追加
+<property>
+  <name>hadoop.proxyuser.hadoop.hosts</name>
+  <value>*</value>
+</property>
+<property>
+  <name>hadoop.proxyuser.hadoop.groups</name>
+  <value>*</value>
+</property>
+```
+
+```
+# sync config, 同步hadoop配置
+rsync -avz /opt/modules/hadoop-3.4.0/etc/hadoop/ hadoop@hadoop2:/opt/modules/hadoop-3.4.0/etc/hadoop/
+rsync -avz /opt/modules/hadoop-3.4.0/etc/hadoop/ hadoop@hadoop3:/opt/modules/hadoop-3.4.0/etc/hadoop/
+```
+
+8. Connect hiveserver2 with beeline (build-in), 用 beeline 客户端连接 hiveserver2
+
+```
+# Start, 启动hiveserver2
 hiveserver2
 ```
 
-- URL: jdbc:hive2://localhost:10000/
+新开 terminal，使用自带客户端 beeline 连接，匿名用户
 
+```
+beeline -u jdbc:hive2://hadoop1:10000/
+show tables;
+```
+
+![](hive_imgs/8.5.png)
+
+- Check web ui, 访问 Web UI: http://hadoop1:10002
+- 可以看到有一个匿名连接
+
+![](hive_imgs/9.png)
+
+9. Connect hiveserver2 with DBeaver, 使用 DBeaver 客户端连接 hiveserver2，匿名用户
+
+- URL: jdbc:hive2://hadoop1:10000/
 - Port，端口: 10000
+- No username, password，匿名用户
+  ![](hive_imgs/10.png)
