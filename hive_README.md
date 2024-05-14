@@ -1,8 +1,10 @@
-#### 安装 hadoop 参考上一篇：https://blog.csdn.net/Jacob12138/article/details/138716667?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22138716667%22%2C%22source%22%3A%22Jacob12138%22%7D
+安装 hadoop 参考上一篇：[安装 hadoop](https://blog.csdn.net/Jacob12138/article/details/138716667)
 
 # Install Hive on Hadoop，hadoop 基础上安装 hive
 
 ## Install MySQL on namenode (hadoop1)，hadoop1 节点安装 MySQL
+
+Hive 是一个基于 Hadoop 的数据仓库框架。
 
 Hive use MySQL to store meta data， mysql 作为 hive 元数据管理， 底层把文件映射成表
 Hive support MySQL versions，hive 推荐支持的 mysql 版本:
@@ -164,7 +166,7 @@ vim hive-site.xml
     <name>javax.jdo.option.ConnectionUserName</name>
     <value>hive</value>
   </property>
-  <!-- hive用户mysql密码 -->
+  <!-- mysql用户hive密码 -->
   <property>
     <name>javax.jdo.option.ConnectionPassword</name>
     <value>Hive123456.</value>
