@@ -249,6 +249,11 @@ hdfs dfs -cat /user/hive/warehouse/employees/000000_3
 7. Add hadoop configuration, 需要修改 hadoop 配置 proxyuser “hadoop”，允许任何 hosts 使用 hadoop 用户的身份
 
 ```
+# 关闭hadoop
+stop-all.sh
+```
+
+```
 # core-site.xml, 追加
 <property>
   <name>hadoop.proxyuser.hadoop.hosts</name>
@@ -264,6 +269,8 @@ hdfs dfs -cat /user/hive/warehouse/employees/000000_3
 # sync config, 同步hadoop配置
 rsync -avz /opt/modules/hadoop-3.4.0/etc/hadoop/ hadoop@hadoop2:/opt/modules/hadoop-3.4.0/etc/hadoop/
 rsync -avz /opt/modules/hadoop-3.4.0/etc/hadoop/ hadoop@hadoop3:/opt/modules/hadoop-3.4.0/etc/hadoop/
+# 启动hadoop
+star-all.sh
 ```
 
 8. Connect hiveserver2 with beeline (build-in), 用 beeline 客户端连接 hiveserver2
